@@ -27,4 +27,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="自定义通知"/>
+
+    <Button
+        android:id="@+id/btn_suspension_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="5.0悬挂式通知"/>
 </LinearLayout>

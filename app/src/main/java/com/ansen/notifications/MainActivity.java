@@ -5,11 +5,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     private int id=1111;
@@ -25,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn_update_notification).setOnClickListener(this);
         findViewById(R.id.btn_delete_notification).setOnClickListener(this);
         findViewById(R.id.btn_custom_notification).setOnClickListener(this);
+        findViewById(R.id.btn_suspension_type).setOnClickListener(this);
     }
 
     @Override
@@ -81,6 +84,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             notification.contentIntent = clickIntent;//点击跳转Intent
             NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(id, notification);
+        }else if(v.getId()==R.id.btn_suspension_type){//5.0悬挂式通知
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){//版本号必须5.0或5.0以上
+                NotificationCompat.Builder mBuilder =
+                        new NotificationCompat.Builder(this)
+                                .setSmallIcon(R.mipmap.ic_launcher)//小图标
+                                .setContentTitle("悬挂式通知-标题")
+                                .setContentText("悬挂式通知-内容");
+
+                Intent intent=new Intent(this,NotificationActivity.class);
+                PendingIntent ClickPending = PendingIntent.getActivity(this, 0, intent, 0);
+
+                mBuilder.setAutoCancel(true);//点击这条通知自动从通知栏中取消
+                mBuilder.setFullScreenIntent(ClickPending, true);//显示悬挂式通知
+                NotificationManager mNotificationManager =
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationManager.notify(id, mBuilder.build());
+            }else{
+                Toast.makeText(this,"Android版本必须>=5.0",Toast.LENGTH_SHORT).show();
+            }
+
         }
     }
 }
