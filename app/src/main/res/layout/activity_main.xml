@@ -33,4 +33,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="5.0悬挂式通知"/>
+
+    <Button
+        android:id="@+id/btn_notification_channels"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="8.0增加通知渠道"/>
+
+    <Button
+        android:id="@+id/btn_select_notification_channels"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="查看通知渠道设置信息"/>
+
+    <Button
+        android:id="@+id/btn_open_notification_channels"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="打开通知渠道设置"/>
+
+    <Button
+        android:id="@+id/btn_delete_notification_channels"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="删除通知渠道"/>
 </LinearLayout>
