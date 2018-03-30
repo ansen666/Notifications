@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
@@ -23,6 +24,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String channelId="channelId1";//渠道id
     private NotificationManager mNotificationManager;
 
+    private String BROADCAST_ACTION="android.intent.action.BROADCAST_ACTION";
+    private DynamicBroadcast dynamicBroadcast;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn_select_notification_channels).setOnClickListener(this);
         findViewById(R.id.btn_open_notification_channels).setOnClickListener(this);
         findViewById(R.id.btn_delete_notification_channels).setOnClickListener(this);
+        findViewById(R.id.btn_notification_broadcast).setOnClickListener(this);
 
         mNotificationManager=(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -52,6 +57,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             mNotificationManager.createNotificationChannel(mChannel);//创建通知渠道
         }
+
+        //动态注册广播
+        dynamicBroadcast=new DynamicBroadcast();
+        IntentFilter intentFilter=new IntentFilter(BROADCAST_ACTION);
+        registerReceiver(dynamicBroadcast,intentFilter);
     }
 
     @Override
@@ -135,6 +145,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 mNotificationManager.notify(id,builder.build());
             }
+        }else if(v.getId()==R.id.btn_notification_broadcast){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                //第二个参数与channelId对应
+                Notification.Builder builder = new Notification.Builder(this,channelId);
+                //icon title text必须包含，不然影响桌面图标小红点的展示
+                builder.setSmallIcon(android.R.drawable.stat_notify_chat)
+                        .setContentTitle("通知渠道1->标题")
+                        .setContentText("通知渠道1->内容")
+                        .setNumber(3); //长按桌面图标时允许的此条通知的数量
+
+                Intent intent = new Intent(BROADCAST_ACTION);
+                intent.putExtra("data","12345");//带上参数
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this,id,intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                builder.setContentIntent(pendingIntent);
+                builder.setAutoCancel(true);
+
+                mNotificationManager.notify(id,builder.build());
+            }
         }else if(v.getId()==R.id.btn_select_notification_channels){//查看通知渠道设置信息
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                 Toast.makeText(this,"具体看Log打印信息",Toast.LENGTH_SHORT).show();
@@ -164,6 +192,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 mNotificationManager.deleteNotificationChannel(channelId);
             }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if(dynamicBroadcast!=null){
+            unregisterReceiver(dynamicBroadcast);
         }
     }
 }

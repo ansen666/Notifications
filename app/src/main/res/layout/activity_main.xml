@@ -38,7 +38,13 @@
         android:id="@+id/btn_notification_channels"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="8.0增加通知渠道"/>
+        android:text="8.0增加通知渠道显示通知"/>
+
+    <Button
+        android:id="@+id/btn_notification_broadcast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="8.0增加点击通知广播接收"/>
 
     <Button
         android:id="@+id/btn_select_notification_channels"

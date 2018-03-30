@@ -16,6 +16,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".NotificationActivity"/>
+        <activity android:name=".NotificationActivity" />
+
+        <!--<receiver android:name=".DynamicBroadcast"-->
+            <!--android:exported="true">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.BROADCAST_ACTION" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
     </application>
 </manifest>
