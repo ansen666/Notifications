@@ -18,7 +18,7 @@ import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity{
     private int id=1111;
     private int number=1;
     private String channelId="channelId1";//渠道id
@@ -32,31 +32,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        findViewById(R.id.btn_create_notification).setOnClickListener(this);
-        findViewById(R.id.btn_update_notification).setOnClickListener(this);
-        findViewById(R.id.btn_delete_notification).setOnClickListener(this);
-        findViewById(R.id.btn_custom_notification).setOnClickListener(this);
-        findViewById(R.id.btn_suspension_type).setOnClickListener(this);
-        findViewById(R.id.btn_notification_channels).setOnClickListener(this);
-        findViewById(R.id.btn_select_notification_channels).setOnClickListener(this);
-        findViewById(R.id.btn_open_notification_channels).setOnClickListener(this);
-        findViewById(R.id.btn_delete_notification_channels).setOnClickListener(this);
-        findViewById(R.id.btn_notification_broadcast).setOnClickListener(this);
-
         mNotificationManager=(NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            //创建通知渠道
-            CharSequence name = "渠道名称1";
-            String description = "渠道描述1";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;//重要性级别 这里用默认的
-            NotificationChannel mChannel = new NotificationChannel(channelId, name, importance);
-            mChannel.setDescription(description);//渠道描述
-            mChannel.enableLights(true);//是否显示通知指示灯
-            mChannel.enableVibration(true);//是否振动
-
-            mNotificationManager.createNotificationChannel(mChannel);//创建通知渠道
-        }
+        addNotificationChannel();
 
         //动态注册广播
         dynamicBroadcast=new DynamicBroadcast();
@@ -64,25 +42,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         registerReceiver(dynamicBroadcast,intentFilter);
     }
 
-    @Override
     public void onClick(View v) {
         if(v.getId()==R.id.btn_create_notification){
             NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(this)
+                    new NotificationCompat.Builder(this,channelId)
                             .setSmallIcon(R.mipmap.ic_launcher)//小图标
-                            .setContentTitle("标题")
-                            .setContentText("内容");
-
+                            .setContentTitle("通知渠道1->标题")
+                            .setContentText("通知渠道1->内容");
             Intent intent=new Intent(this,NotificationActivity.class);
             PendingIntent ClickPending = PendingIntent.getActivity(this, 0, intent, 0);
 
             mBuilder.setContentIntent(ClickPending);
             mBuilder.setAutoCancel(true);//点击这条通知自动从通知栏中取消
 
-            mNotificationManager.notify(id, mBuilder.build());
+            mNotificationManager.notify(id,mBuilder.build());
         }else if(v.getId()==R.id.btn_update_notification){
             NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(this)
+                    new NotificationCompat.Builder(this,channelId)
                             .setSmallIcon(R.mipmap.ic_launcher)//小图标
                             .setContentTitle("更新通知-标题"+(++number))
                             .setContentText("更新通知-内容").setNumber(number);
@@ -106,7 +82,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent=new Intent(this,NotificationActivity.class);
             PendingIntent clickIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-            Notification notification = new Notification();
+            NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(this,channelId);
+            Notification notification = mBuilder.build();
             //必须要设置一个图标，通知区域中需要显示
             notification.icon = android.R.drawable.ic_media_play;
             notification.contentView = remoteViews;//自定义布局
@@ -115,37 +93,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }else if(v.getId()==R.id.btn_suspension_type){//5.0悬挂式通知
             if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.LOLLIPOP){//版本号必须5.0或5.0以上
                 NotificationCompat.Builder mBuilder =
-                        new NotificationCompat.Builder(this)
+                        new NotificationCompat.Builder(this,channelId)
                                 .setSmallIcon(R.mipmap.ic_launcher)//小图标
                                 .setContentTitle("悬挂式通知-标题")
                                 .setContentText("悬挂式通知-内容");
 
                 Intent intent=new Intent(this,NotificationActivity.class);
                 PendingIntent ClickPending = PendingIntent.getActivity(this, 0, intent, 0);
-
                 mBuilder.setAutoCancel(true);//点击这条通知自动从通知栏中取消
                 mBuilder.setFullScreenIntent(ClickPending, true);//显示悬挂式通知
                 mNotificationManager.notify(id, mBuilder.build());
             }else{
                 Toast.makeText(this,"Android版本必须>=5.0",Toast.LENGTH_SHORT).show();
             }
-        }else if(v.getId()==R.id.btn_notification_channels){//新增/管理通知渠道
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                //第二个参数与channelId对应
-                Notification.Builder builder = new Notification.Builder(this,channelId);
-                //icon title text必须包含，不然影响桌面图标小红点的展示
-                builder.setSmallIcon(android.R.drawable.stat_notify_chat)
-                        .setContentTitle("通知渠道1->标题")
-                        .setContentText("通知渠道1->内容")
-                        .setNumber(3); //久按桌面图标时允许的此条通知的数量
-
-                Intent intent=new Intent(this,NotificationActivity.class);
-                PendingIntent ClickPending = PendingIntent.getActivity(this, 0, intent, 0);
-                builder.setContentIntent(ClickPending);
-
-                mNotificationManager.notify(id,builder.build());
-            }
-        }else if(v.getId()==R.id.btn_notification_broadcast){
+        }else if(v.getId()==R.id.btn_notification_broadcast){//点击通知 广播接收
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 //第二个参数与channelId对应
                 Notification.Builder builder = new Notification.Builder(this,channelId);
@@ -192,6 +153,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 mNotificationManager.deleteNotificationChannel(channelId);
             }
+        }else if(v.getId()==R.id.btn_add_notification_channels){//添加通知渠道
+            addNotificationChannel();
+        }
+    }
+
+    public void addNotificationChannel(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //创建通知渠道
+            CharSequence name = "渠道名称1";
+            String description = "渠道描述1";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;//重要性级别 这里用默认的
+            NotificationChannel mChannel = new NotificationChannel(channelId, name, importance);
+            mChannel.setDescription(description);//渠道描述
+            mChannel.enableLights(true);//是否显示通知指示灯
+            mChannel.enableVibration(true);//是否振动
+
+            mNotificationManager.createNotificationChannel(mChannel);//创建通知渠道
         }
     }
 
