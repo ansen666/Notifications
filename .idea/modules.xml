@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Notifications.iml" filepath="$PROJECT_DIR$/Notifications.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/Notifications-app.iml" filepath="$PROJECT_DIR$/app/Notifications-app.iml" group="Notifications/app" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/github-Notifications.iml" filepath="$PROJECT_DIR$/github-Notifications.iml" group="Notifications" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Notifications.iml" filepath="$PROJECT_DIR$/.idea/modules/Notifications.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/Notifications.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/Notifications.app.iml" />
     </modules>
   </component>
 </project>
